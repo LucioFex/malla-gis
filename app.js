@@ -278,7 +278,7 @@
       '<div class="ficha-cuerpo">' +
         '<div class="puntaje"><b style="color:' + k.color + '">' + t.indice.toFixed(0) + '</b>' +
         '<i>criticidad ' + k.texto.toLowerCase() + ', sobre 100 del peor tramo de la ciudad</i></div>' +
-        '<div class="cinta"><div style="width:' + t.indice + '%;background:' + k.color + '"></div></div>' +
+        '<div class="cinta"><div style="transform:scaleX(' + (t.indice / 100) + ');background:' + k.color + '"></div></div>' +
 
         '<div class="formula">' +
           '<div class="formula-linea"><span>Probabilidad anual de falla</span><b>' + pct + ' %</b></div>' +
