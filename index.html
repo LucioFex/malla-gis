@@ -79,10 +79,31 @@
 
     <div class="aviso" id="aviso">
       <p><b>Maqueta con datos mixtos.</b> La traza de calles y los receptores sensibles son reales, de OpenStreetMap. La serie de reclamos es real, de ENARGAS. Los hogares aguas abajo, el material y la antigüedad de cada tramo son de muestra, porque la traza fina de la red no es dato público.</p>
-      <p><button class="aviso-cerrar" id="aviso-cerrar" type="button">Entendido</button></p>
+      <p><button class="aviso-cerrar" id="aviso-cerrar" type="button">Ver el esquema de la solución</button></p>
     </div>
   </main>
 
+</div>
+
+<div class="telon" id="telon" hidden>
+  <section class="esquema" role="dialog" aria-modal="true" aria-labelledby="esquema-titulo">
+    <div class="esquema-cabeza">
+      <div style="flex:1">
+        <h2 id="esquema-titulo">Esquema de la solución</h2>
+        <p>De dónde sale cada dato, qué hace el motor de cálculo y qué devuelve. Los números
+        corresponden a la ciudad que está en pantalla.</p>
+      </div>
+      <button class="cerrar" id="esquema-cerrar" type="button" aria-label="Cerrar">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg>
+      </button>
+    </div>
+    <div class="esquema-cuerpo" id="esquema-cuerpo"></div>
+    <div class="esquema-pie">
+      <span><i class="real"></i> Motor de cálculo determinístico</span>
+      <span><i></i> Fuente de datos</span>
+      <span>Fuentes reales: OpenStreetMap, ODbL, INDEC y ENARGAS, CC BY 4.0.</span>
+    </div>
+  </section>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

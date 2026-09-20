@@ -254,7 +254,7 @@
     if (ficha) ficha.remove();
 
     var k = clase(t.score);
-    var pct = (t.prob * 100).toFixed(2);
+    var pct = (t.prob * 100).toFixed(2).replace(".", ",");
 
     var receptores = t.receptores.length
       ? t.receptores.map(function (r) {
@@ -284,7 +284,7 @@
           '<div class="formula-linea"><span>Probabilidad anual de falla</span><b>' + pct + ' %</b></div>' +
           '<div class="formula-op">por</div>' +
           '<div class="formula-linea"><span>Hogares aguas abajo</span><b>' + num(t.hogares) + '</b></div>' +
-          '<div class="formula-linea"><span>Factor por receptores</span><b>&times; ' + t.factor.toFixed(2) + '</b></div>' +
+          '<div class="formula-linea"><span>Factor por receptores</span><b>&times; ' + t.factor.toFixed(2).replace(".", ",") + '</b></div>' +
           '<div class="formula-linea formula-total"><span>Consecuencia</span><b>' + num(t.consecuencia) + ' hogares equivalentes</b></div>' +
         '</div>' +
 
@@ -308,6 +308,123 @@
     if (ficha) { ficha.remove(); ficha = null; }
     capaFoco.clearLayers();
     estado.seleccion = null;
+  }
+
+  /* ---------- esquema de la solucion ---------- */
+  /* La catedra pide el esquema de la solucion dibujado, a alto nivel, en el entendimiento
+     del alcance. Se dibuja con los numeros de la ciudad que esta en pantalla para que sea
+     el mismo dato que muestra el mapa y no una ilustracion aparte. */
+
+  var ESQ = { ancho: 880, alto: 400 };
+
+  function caja(x, y, an, al, titulo, lineas, nota, motor) {
+    var s = '<rect class="' + (motor ? "dibujo-caja-motor" : "dibujo-caja") + '" x="' + x +
+      '" y="' + y + '" width="' + an + '" height="' + al + '" rx="4"/>';
+    s += '<text class="dibujo-titulo" x="' + (x + 12) + '" y="' + (y + 21) + '">' + titulo + "</text>";
+    lineas.forEach(function (l, i) {
+      s += '<text class="dibujo-texto" x="' + (x + 12) + '" y="' + (y + 38 + i * 14) + '">' + l + "</text>";
+    });
+    if (nota) {
+      s += '<text class="dibujo-nota" x="' + (x + an - 12) + '" y="' + (y + 21) +
+        '" text-anchor="end">' + nota + "</text>";
+    }
+    return s;
+  }
+
+  function flecha(x1, y1, x2, y2) {
+    var dx = Math.max(18, (x2 - x1) / 2);
+    return '<path class="dibujo-flecha" marker-end="url(#punta)" d="M' + x1 + " " + y1 +
+      " C" + (x1 + dx) + " " + y1 + ", " + (x2 - dx) + " " + y2 + ", " + (x2 - 7) + " " + y2 + '"/>';
+  }
+
+  function flechaAbajo(x, y1, y2) {
+    return '<path class="dibujo-flecha" marker-end="url(#punta)" d="M' + x + " " + y1 +
+      "L" + x + " " + (y2 - 7) + '"/>';
+  }
+
+  function rotulo(x, texto) {
+    return '<text class="dibujo-rotulo" x="' + x + '" y="16">' + texto.toUpperCase() + "</text>";
+  }
+
+  function dibujarEsquema() {
+    var c = D.ciudades[estado.ciudad];
+    var conReceptor = 0;
+    c.tramos.forEach(function (t) { if (t.receptores.length) conReceptor++; });
+
+    var X1 = 4, A1 = 236, X2 = 316, A2 = 244, X3 = 636, A3 = 240;
+
+    var s = '<svg viewBox="0 0 ' + ESQ.ancho + " " + ESQ.alto + '" role="img" ' +
+      'aria-label="Esquema de la solucion, de las fuentes al motor de calculo y a las salidas">';
+
+    s += '<defs><marker id="punta" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" ' +
+      'markerHeight="7" orient="auto"><path d="M0 1L7 4L0 7" fill="none" stroke="#cac3b6" ' +
+      'stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>';
+
+    s += rotulo(X1, "Fuentes") + rotulo(X2, "Cálculo") + rotulo(X3, "Lo que devuelve");
+
+    /* Las fuentes van en el orden de su destino, para que ninguna flecha cruce a otra. */
+    s += caja(X1, 28, A1, 60, "Callejero",
+      ["OpenStreetMap, " + num(c.tramos.length) + " tramos", "define el grafo de la red"], "real");
+    s += caja(X1, 100, A1, 60, "Reclamos resueltos",
+      ["ENARGAS, " + num(D.reclamos_total_grupo_ii) + " reclamos", "de 2018 a 2026"], "real");
+    s += caja(X1, 172, A1, 60, "Atributos del caño",
+      ["material, antigüedad, diámetro"], "muestra");
+    s += caja(X1, 244, A1, 60, "Receptores sensibles",
+      ["OpenStreetMap, " + num(c.receptores.length) + " puntos", "escuelas, hospitales, jardines"], "real");
+    s += caja(X1, 316, A1, 60, "Hogares por radio censal",
+      ["INDEC, censo 2022"], "real");
+
+    /* Los dos factores en columna, con el signo del producto entre ellos. */
+    s += caja(X2, 56, A2, 92, "Probabilidad de falla",
+      ["tasa base por zona y", "estacionalidad, modulada por", "los atributos del tramo"], null, true);
+
+    s += '<text class="dibujo-formula" style="font-size:17px" x="' + (X2 + A2 / 2) +
+      '" y="178" text-anchor="middle">×</text>';
+
+    s += caja(X2, 196, A2, 92, "Consecuencia si falla",
+      ["hogares aguas abajo del tramo", "en el grafo, por el factor de", "receptores sensibles"], null, true);
+
+    s += '<rect class="dibujo-caja-motor" x="' + X2 + '" y="326" width="' + A2 + '" height="52" rx="4"/>';
+    s += '<text class="dibujo-formula" x="' + (X2 + A2 / 2) + '" y="348" text-anchor="middle">' +
+      "criticidad del tramo</text>";
+    s += '<text class="dibujo-nota" x="' + (X2 + A2 / 2) + '" y="365" text-anchor="middle">' +
+      "un número por tramo, de 0 a 100</text>";
+
+    s += caja(X3, 60, A3, 76, "Capas del visor",
+      ["criticidad, receptores y hogares,", "con umbral y desglose por tramo"]);
+    s += caja(X3, 164, A3, 76, "Cola de tramos",
+      [num(conReceptor) + " de los críticos tienen", "un receptor sensible cerca"]);
+    s += caja(X3, 268, A3, 76, "Recorrida del día",
+      ["el mejor subconjunto que entra", "en la jornada de la cuadrilla"]);
+
+    // fuentes hacia los dos factores, sin cruces
+    s += flecha(X1 + A1, 58, X2, 80);
+    s += flecha(X1 + A1, 130, X2, 102);
+    s += flecha(X1 + A1, 202, X2, 124);
+    s += flecha(X1 + A1, 274, X2, 220);
+    s += flecha(X1 + A1, 346, X2, 242);
+
+    // del producto a la criticidad
+    s += flechaAbajo(X2 + A2 / 2, 288, 326);
+
+    // de la criticidad a las tres salidas
+    s += flecha(X2 + A2, 352, X3, 98);
+    s += flecha(X2 + A2, 352, X3, 202);
+    s += flecha(X2 + A2, 352, X3, 306);
+
+    s += "</svg>";
+
+    document.getElementById("esquema-cuerpo").innerHTML = s;
+  }
+
+  function abrirEsquema() {
+    dibujarEsquema();
+    document.getElementById("telon").hidden = false;
+    document.getElementById("esquema-cerrar").focus();
+  }
+
+  function cerrarEsquema() {
+    document.getElementById("telon").hidden = true;
   }
 
   /* ---------- arranque ---------- */
@@ -345,14 +462,18 @@
 
     document.getElementById("aviso-cerrar").addEventListener("click", function () {
       document.getElementById("aviso").style.display = "none";
+      abrirEsquema();
     });
-    document.getElementById("btn-procedencia").addEventListener("click", function () {
-      var a = document.getElementById("aviso");
-      a.style.display = a.style.display === "none" ? "block" : "none";
+    document.getElementById("btn-procedencia").addEventListener("click", abrirEsquema);
+    document.getElementById("esquema-cerrar").addEventListener("click", cerrarEsquema);
+    document.getElementById("telon").addEventListener("click", function (e) {
+      if (e.target.id === "telon") cerrarEsquema();
     });
 
     document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") cerrarFicha();
+      if (e.key !== "Escape") return;
+      if (!document.getElementById("telon").hidden) cerrarEsquema();
+      else cerrarFicha();
     });
 
     iniciarMapa();
