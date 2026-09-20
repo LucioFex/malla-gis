@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Malla GIS, visor de criticidad de red</title>
+<meta name="description" content="Variante A de Malla: visor de capas sobre mapa base, con la criticidad de cada tramo de la red de distribucion de gas.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%237b1e2b'/%3E%3Cg stroke='%23fbfaf8' stroke-width='2' fill='none'%3E%3Cpath d='M6 11h20M6 21h20M11 6v20M21 6v20'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+
+<header class="barra">
+  <div class="marca">
+    <b>Malla</b>
+    <span>Visor de criticidad de red</span>
+  </div>
+
+  <div class="barra-sep"></div>
+
+  <label class="campo">
+    Ciudad
+    <select id="ciudad" aria-label="Ciudad"></select>
+  </label>
+
+  <label class="campo">
+    Distribuidora
+    <select disabled aria-label="Distribuidora">
+      <option>Camuzzi Gas Pampeana</option>
+    </select>
+  </label>
+
+  <div class="barra-fin">
+    <button class="boton" id="btn-procedencia" type="button">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="8" cy="8" r="6.25"/><path d="M8 7.2v4"/><path d="M8 4.9h.01"/>
+      </svg>
+      Procedencia del dato
+    </button>
+  </div>
+</header>
+
+<div class="cuerpo">
+
+  <aside class="lateral">
+    <section class="bloque">
+      <h2>Capas</h2>
+      <div id="capas"></div>
+    </section>
+
+    <section class="bloque">
+      <h2>Criticidad del tramo</h2>
+      <div class="leyenda" id="leyenda"></div>
+    </section>
+
+    <section class="bloque">
+      <div class="rango-cabeza">
+        <h2 style="margin:0">Umbral de criticidad</h2>
+        <span class="rango-valor" id="umbral-valor">0</span>
+      </div>
+      <input type="range" id="umbral" min="0" max="95" step="5" value="0" aria-label="Umbral de criticidad">
+      <p style="margin:10px 0 0;font-size:12px;color:var(--tinta-3)">
+        <span id="umbral-conteo"></span>
+      </p>
+    </section>
+
+    <section class="bloque">
+      <h2>Los diez primeros</h2>
+      <div id="top"></div>
+    </section>
+  </aside>
+
+  <main class="mapa-zona">
+    <div id="mapa"></div>
+
+    <div class="aviso" id="aviso">
+      <p><b>Maqueta con datos mixtos.</b> La traza de calles y los receptores sensibles son reales, de OpenStreetMap. La serie de reclamos es real, de ENARGAS. Los hogares aguas abajo, el material y la antigüedad de cada tramo son de muestra, porque la traza fina de la red no es dato público.</p>
+      <p><button class="aviso-cerrar" id="aviso-cerrar" type="button">Entendido</button></p>
+    </div>
+  </main>
+
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="datos/malla-datos.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
