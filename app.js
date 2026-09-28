@@ -281,7 +281,7 @@
         '<div class="cinta"><div style="transform:scaleX(' + (t.indice / 100) + ');background:' + k.color + '"></div></div>' +
 
         '<div class="formula">' +
-          '<div class="formula-linea"><span>Probabilidad anual de falla</span><b>' + pct + ' %</b></div>' +
+          '<div class="formula-linea"><span>Probabilidad de falla</span><b>' + pct + ' %</b></div>' +
           '<div class="formula-op">por</div>' +
           '<div class="formula-linea"><span>Hogares aguas abajo</span><b>' + num(t.hogares) + '</b></div>' +
           '<div class="formula-linea"><span>Factor por receptores</span><b>&times; ' + t.factor.toFixed(2).replace(".", ",") + '</b></div>' +
@@ -376,7 +376,7 @@
 
     /* Los dos factores en columna, con el signo del producto entre ellos. */
     s += caja(X2, 56, A2, 92, "Probabilidad de falla",
-      ["tasa base por zona y", "estacionalidad, modulada por", "los atributos del tramo"], null, true);
+      ["base de muestra por los", "atributos del tramo, por el", "factor de carga del modelo"], null, true);
 
     s += '<text class="dibujo-formula" style="font-size:17px" x="' + (X2 + A2 / 2) +
       '" y="178" text-anchor="middle">×</text>';
