@@ -165,7 +165,7 @@
     var defs = [
       { id: "red", texto: "Tramos de red", conteo: num(c.tramos.length) + " tramos" },
       { id: "receptores", texto: "Receptores sensibles", conteo: num(c.receptores.length) + " puntos" },
-      { id: "hogares", texto: "Densidad de hogares", conteo: "muestra" }
+      { id: "hogares", texto: "Hogares aguas abajo", conteo: "censo 2022" }
     ];
 
     document.getElementById("capas").innerHTML = defs.map(function (d) {
@@ -372,7 +372,7 @@
     s += caja(X1, 244, A1, 60, "Receptores sensibles",
       ["OpenStreetMap, " + num(c.receptores.length) + " puntos", "escuelas, hospitales, jardines"], "real");
     s += caja(X1, 316, A1, 60, "Hogares por radio censal",
-      ["INDEC, censo 2022"], "real");
+      ["INDEC, censo 2022", "estimados desde el partido"], "real");
 
     /* Los dos factores en columna, con el signo del producto entre ellos. */
     s += caja(X2, 56, A2, 92, "Probabilidad de falla",
